@@ -1,3 +1,5 @@
+![CI](https://github.com/makhentosch/agromarket-server/actions/workflows/ci.yml/badge.svg)
+
 # АгроМаркет — сервер (REST API)
 
 Учебный интернет-магазин фермерских продуктов. Сервер на Node.js + Express + PostgreSQL:
@@ -37,3 +39,17 @@
 - на неверный пароль и неизвестный e-mail сервер отвечает одинаково;
 - `helmet`, CORS только для адреса фронтенда, лимит тела запроса 10 КБ;
 - секреты — только в `.env`, который не попадает в Git.
+
+## Тестирование
+1. Создать базу `agromarket_test` (pgAdmin или psql)
+2. Скопировать `.env` в `.env.test` и указать в нём тестовую базу
+3. `npm test` — все тесты, `npm run test:watch` — режим наблюдения,
+   `npm run coverage` — отчёт о покрытии (сейчас: Lines 81.56%)
+
+Тесты сами пересоздают таблицы в `agromarket_test` перед запуском (`tests/globalSetup.js`)
+и откажутся работать, если в настройках подключения нет слова `test` — рабочая база защищена.
+
+## Правила работы с Git
+- Ветка `main` защищена: изменения — только через Pull Request
+- PR сливается после зелёного CI и одобрения ревьюера
+- Ветки: `feature/...`, `fix/...`; коммиты: feat, fix, test, refactor, docs, ci, chore
