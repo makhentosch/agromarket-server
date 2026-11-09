@@ -4,7 +4,7 @@ import app from '../app.js';
 
 describe('Каталог: публичный доступ', () => {
   it('GET /api/products возвращает непустой список', async () => {
-    // Act: выполняем действие — отправляем запрос
+    // Act: выполняем действие - отправляем запрос
     const res = await request(app).get('/api/products');
 
     // Assert: проверяем результат
@@ -22,7 +22,7 @@ describe('Каталог: публичный доступ', () => {
     expect(product).toHaveProperty('price');
   });
 
-  it('несуществующий товар — 404', async () => {
+  it('несуществующий товар - 404', async () => {
     const res = await request(app).get('/api/products/999999');
     expect(res.status).toBe(404);
   });

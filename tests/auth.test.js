@@ -24,16 +24,16 @@ describe('POST /api/auth/register', () => {
     expect(res.body.user.role).toBe('user');
   });
 
-  it('повторный e-mail — 409', async () => {
+  it('повторный e-mail - 409', async () => {
     const body = { name: 'Дубль', email: uniqueEmail(), password: 'qwerty123' };
-    await request(app).post('/api/auth/register').send(body); // первый раз — 201
+    await request(app).post('/api/auth/register').send(body); // первый раз - 201
 
     const res = await request(app).post('/api/auth/register').send(body);
 
     expect(res.status).toBe(409);
   });
 
-  it('слишком короткий пароль — 400', async () => {
+  it('слишком короткий пароль - 400', async () => {
     const res = await request(app)
       .post('/api/auth/register')
       .send({ name: 'Короткий', email: uniqueEmail(), password: '123' });
@@ -79,12 +79,12 @@ describe('POST /api/auth/login', () => {
 });
 
 describe('GET /api/auth/me', () => {
-  it('без токена — 401', async () => {
+  it('без токена - 401', async () => {
     const res = await request(app).get('/api/auth/me');
     expect(res.status).toBe(401);
   });
 
-  it('с токеном покупателя — 200 и без password_hash', async () => {
+  it('с токеном покупателя - 200 и без password_hash', async () => {
     const token = await getUserToken();
 
     const res = await request(app)

@@ -36,7 +36,7 @@ describe('requireRole', () => {
 });
 
 describe('requireAuth', () => {
-  it('без заголовка Authorization — 401', () => {
+  it('без заголовка Authorization - 401', () => {
     const res = mockRes();
     const next = vi.fn();
 
@@ -57,7 +57,7 @@ describe('requireAuth', () => {
     expect(req.user).toEqual({ id: 7, role: 'user' });
   });
 
-  it('истёкший токен — 401 и сообщение «истёк»', () => {
+  it('истёкший токен - 401 и сообщение «истёк»', () => {
     const token = jwt.sign(
       { sub: '7', role: 'user', exp: Math.floor(Date.now() / 1000) - 60 },
       process.env.JWT_SECRET,
@@ -75,7 +75,7 @@ describe('requireAuth', () => {
 });
 
 describe('errorHandler', () => {
-  // errorHandler пишет ошибку в лог — в выводе тестов она не нужна
+  // errorHandler пишет ошибку в лог - в выводе тестов она не нужна
   beforeEach(() => vi.spyOn(console, 'error').mockImplementation(() => {}));
   afterEach(() => {
     vi.unstubAllEnvs(); // вернуть NODE_ENV после каждого теста

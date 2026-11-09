@@ -7,7 +7,7 @@ export default function setup() {
   if (!target.includes('test')) {
     throw new Error('Тесты должны работать с тестовой базой! Проверьте .env.test');
   }
-  // Пересоздаём таблицы и заполняем тестовую базу — как npm run db:init
+  // Пересоздаём таблицы и заполняем тестовую базу - как npm run db:init
   execSync('npm run db:init', { stdio: 'inherit' });
   execSync('npm run db:migrate', { stdio: 'inherit' }); // миграция поверх готовой базы ничего не ломает
 }

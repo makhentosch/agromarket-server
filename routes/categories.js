@@ -3,7 +3,7 @@ import { pool } from '../db/pool.js';
 
 const router = Router();
 
-// GET /api/categories — категории и количество товаров в каждой
+// GET /api/categories - категории и количество товаров в каждой
 router.get('/', async (req, res, next) => {
   try {
     const { rows } = await pool.query(

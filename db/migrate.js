@@ -3,8 +3,8 @@ import bcrypt from 'bcryptjs';
 import { pool } from './pool.js';
 
 // Миграция НЕ удаляет данные: создаёт только то, чего ещё нет.
-// Её можно запускать сколько угодно раз — результат один и тот же.
-// Колонки — один в один как в db/schema.sql (её выполняет db:init)
+// Её можно запускать сколько угодно раз - результат один и тот же.
+// Колонки - один в один как в db/schema.sql (её выполняет db:init)
 const statements = [
   `CREATE TABLE IF NOT EXISTS users (
     id            SERIAL PRIMARY KEY,

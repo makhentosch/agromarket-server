@@ -16,12 +16,12 @@ describe('Изменение каталога: только admin', () => {
     adminToken = await getAdminToken();
   });
 
-  it('без токена — 401', async () => {
+  it('без токена - 401', async () => {
     const res = await request(app).post('/api/products').send(newProduct);
     expect(res.status).toBe(401);
   });
 
-  it('покупатель — 403', async () => {
+  it('покупатель - 403', async () => {
     const res = await request(app)
       .post('/api/products')
       .set('Authorization', `Bearer ${userToken}`)
@@ -29,7 +29,7 @@ describe('Изменение каталога: только admin', () => {
     expect(res.status).toBe(403);
   });
 
-  it('токен, подписанный чужим ключом, — 401', async () => {
+  it('токен, подписанный чужим ключом, - 401', async () => {
     // Тот же опыт, что с jwt.io в ЛР7: role = admin, но подпись не наша
     const fakeToken = jwt.sign({ sub: '1', role: 'admin' }, 'чужой-секрет');
 
@@ -63,7 +63,7 @@ describe('Изменение каталога: только admin', () => {
     expect(afterDelete.status).toBe(404);
   });
 
-  it('покупатель не может удалить товар — 403', async () => {
+  it('покупатель не может удалить товар - 403', async () => {
     const res = await request(app)
       .delete('/api/products/1')
       .set('Authorization', `Bearer ${userToken}`);
@@ -80,19 +80,19 @@ describe('Заявки', () => {
     adminToken = await getAdminToken();
   });
 
-  it('GET /api/orders без токена — 401', async () => {
+  it('GET /api/orders без токена - 401', async () => {
     const res = await request(app).get('/api/orders');
     expect(res.status).toBe(401);
   });
 
-  it('GET /api/orders с токеном покупателя — 403', async () => {
+  it('GET /api/orders с токеном покупателя - 403', async () => {
     const res = await request(app)
       .get('/api/orders')
       .set('Authorization', `Bearer ${userToken}`);
     expect(res.status).toBe(403);
   });
 
-  it('GET /api/orders с токеном админа — 200 и массив', async () => {
+  it('GET /api/orders с токеном админа - 200 и массив', async () => {
     const res = await request(app)
       .get('/api/orders')
       .set('Authorization', `Bearer ${adminToken}`);
@@ -100,7 +100,7 @@ describe('Заявки', () => {
     expect(Array.isArray(res.body)).toBe(true);
   });
 
-  it('POST /api/orders доступен без токена — 201, заявку видит админ', async () => {
+  it('POST /api/orders доступен без токена - 201, заявку видит админ', async () => {
     const order = { name: 'ТОО Тестовая ферма', email: 'Farm@Test.KZ', volume: 50 };
 
     const created = await request(app).post('/api/orders').send(order);
@@ -113,7 +113,7 @@ describe('Заявки', () => {
     expect(list.body.map((o) => o.id)).toContain(created.body.id);
   });
 
-  it('POST /api/orders с объёмом меньше 10 кг — 400', async () => {
+  it('POST /api/orders с объёмом меньше 10 кг - 400', async () => {
     const res = await request(app)
       .post('/api/orders')
       .send({ name: 'Мелкий опт', email: 'small@test.kz', volume: 5 });

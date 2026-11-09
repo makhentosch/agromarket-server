@@ -25,7 +25,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
 
-    # Переменные окружения вместо .env.test (значения — только для CI)
+    # Переменные окружения вместо .env.test (значения - только для CI)
     env:
       NODE_ENV: test
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/agromarket_test

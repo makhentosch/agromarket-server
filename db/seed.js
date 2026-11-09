@@ -4,11 +4,11 @@ import bcrypt from 'bcryptjs';
 import { pool } from './pool.js';
 
 // --- Предохранитель: db:init УДАЛЯЕТ ВСЕ ТАБЛИЦЫ ---
-// Разрешаем без вопросов только локальную базу (и базу CI — она тоже localhost)
+// Разрешаем без вопросов только локальную базу (и базу CI - она тоже localhost)
 const target = process.env.DATABASE_URL || process.env.PGHOST || '';
 const isLocal = /localhost|127\.0\.0\.1/.test(target);
 if (!isLocal && !process.argv.includes('--force')) {
-  console.error('Отказ: db:init запущен НЕ на локальной базе — все данные будут удалены.');
+  console.error('Отказ: db:init запущен НЕ на локальной базе - все данные будут удалены.');
   console.error('Если база пустая и вы уверены: node db/seed.js --force');
   process.exit(1);
 }
@@ -54,7 +54,7 @@ async function seed() {
     ['Администратор', adminEmail.trim().toLowerCase(), hash],
   );
 
-  console.log(`Готово: товаров — ${products.length}, админ — ${adminEmail}`);
+  console.log(`Готово: товаров - ${products.length}, админ - ${adminEmail}`);
 }
 
 try {

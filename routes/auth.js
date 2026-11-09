@@ -26,7 +26,7 @@ function createToken(user) {
   });
 }
 
-// POST /api/auth/register — регистрация покупателя
+// POST /api/auth/register - регистрация покупателя
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body ?? {};
 
@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'Некорректный e-mail' });
   }
   if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
-    return res.status(400).json({ error: `Пароль — не меньше ${MIN_PASSWORD_LENGTH} символов` });
+    return res.status(400).json({ error: `Пароль - не меньше ${MIN_PASSWORD_LENGTH} символов` });
   }
 
   const normalizedEmail = email.trim().toLowerCase();
@@ -61,7 +61,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// POST /api/auth/login — вход по e-mail и паролю
+// POST /api/auth/login - вход по e-mail и паролю
 router.post('/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body ?? {};
 
@@ -86,7 +86,7 @@ router.post('/login', loginLimiter, async (req, res) => {
   res.json({ token: createToken(user), user });
 });
 
-// GET /api/auth/me — данные текущего пользователя по токену
+// GET /api/auth/me - данные текущего пользователя по токену
 router.get('/me', requireAuth, async (req, res) => {
   const { rows } = await pool.query(
     'SELECT id, name, email, role, created_at FROM users WHERE id = $1',
