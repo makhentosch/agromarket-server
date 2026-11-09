@@ -63,6 +63,16 @@ check('несуществующий товар — 404', async () => {
   assert(res.status === 404, `ожидали 404, получили ${res.status}`);
 });
 
+check('категории: сумма count равна числу товаров', async () => {
+  const [categories, products] = await Promise.all([
+    fetch(`${API_URL}/categories`).then((r) => r.json()),
+    fetch(`${API_URL}/products`).then((r) => r.json()),
+  ]);
+  assert(Array.isArray(categories) && categories.length > 0, 'список категорий пуст');
+  const total = categories.reduce((sum, c) => sum + c.count, 0);
+  assert(total === products.length, `категории: ${total}, товаров: ${products.length}`);
+});
+
 async function main() {
   const health = await waitForVersion();
   console.log(`API работает: версия ${health.version}, база ${health.db}`);
