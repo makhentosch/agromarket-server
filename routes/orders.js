@@ -7,7 +7,7 @@ const router = Router();
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_VOLUME = 10;
 
-// POST /api/orders — оптовая заявка из формы на сайте (доступна всем)
+// POST /api/orders - оптовая заявка из формы на сайте (доступна всем)
 router.post('/', async (req, res) => {
   const { name, email, phone = null, volume, date = null, comment = null } = req.body ?? {};
 
@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Некорректный e-mail' });
   }
   if (!Number.isInteger(volume) || volume < MIN_VOLUME) {
-    return res.status(400).json({ error: `Объём заказа — целое число от ${MIN_VOLUME} кг` });
+    return res.status(400).json({ error: `Объём заказа - целое число от ${MIN_VOLUME} кг` });
   }
 
   const { rows } = await pool.query(
@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
-// GET /api/orders — все заявки (только admin)
+// GET /api/orders - все заявки (только admin)
 router.get('/', requireAuth, adminOnly, async (req, res) => {
   const { rows } = await pool.query(
     `SELECT id, name, email, phone, volume, delivery_date, comment, status, created_at

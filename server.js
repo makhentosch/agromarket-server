@@ -2,7 +2,7 @@ import 'dotenv/config'; // по-прежнему первая строка
 import app from './app.js';
 import { pool } from './db/pool.js';
 
-// Без этих переменных запускаться бессмысленно — падаем сразу и с понятным текстом
+// Без этих переменных запускаться бессмысленно - падаем сразу и с понятным текстом
 const required = ['DATABASE_URL', 'JWT_SECRET', 'CORS_ORIGIN'];
 const missing = required.filter((name) => !process.env[name]);
 if (missing.length > 0) {

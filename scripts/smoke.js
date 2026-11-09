@@ -28,7 +28,7 @@ async function waitForVersion() {
   throw new Error(`Не дождались версии ${EXPECTED || '(любой)'} за ~10 минут`);
 }
 
-// Шаг 2. Проверки. Каждая — функция, которая бросает ошибку, если что-то не так
+// Шаг 2. Проверки. Каждая - функция, которая бросает ошибку, если что-то не так
 const checks = [];
 const check = (name, fn) => checks.push({ name, fn });
 const assert = (condition, message) => {
@@ -58,7 +58,7 @@ check('CORS: фронтенд допущен', async () => {
   assert(allowed === FRONTEND_URL, `access-control-allow-origin = ${allowed}`);
 });
 
-check('несуществующий товар — 404', async () => {
+check('несуществующий товар - 404', async () => {
   const res = await fetch(`${API_URL}/products/999999`);
   assert(res.status === 404, `ожидали 404, получили ${res.status}`);
 });

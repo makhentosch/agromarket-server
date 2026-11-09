@@ -8,7 +8,7 @@ describe('GET /api/categories', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.length).toBeGreaterThan(0);
-    expect(typeof res.body[0].count).toBe('number'); // ::int — число, а не строка
+    expect(typeof res.body[0].count).toBe('number'); // ::int - число, а не строка
   });
 
   it('сумма count по всем категориям равна числу товаров в каталоге', async () => {

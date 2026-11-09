@@ -24,7 +24,7 @@ function validateProduct(body) {
   return null;
 }
 
-// GET /api/products?category=Мёд — каталог (доступен всем)
+// GET /api/products?category=Мёд - каталог (доступен всем)
 router.get('/', async (req, res) => {
   const { category } = req.query;
   const { rows } = category
@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
   res.json(rows);
 });
 
-// GET /api/products/:id — один товар
+// GET /api/products/:id - один товар
 router.get('/:id', async (req, res) => {
   const id = parseId(req.params.id);
   if (!id) {
@@ -46,7 +46,7 @@ router.get('/:id', async (req, res) => {
   res.json(rows[0]);
 });
 
-// POST /api/products — добавить товар (только admin)
+// POST /api/products - добавить товар (только admin)
 router.post('/', requireAuth, adminOnly, async (req, res) => {
   const error = validateProduct(req.body);
   if (error) {
@@ -62,7 +62,7 @@ router.post('/', requireAuth, adminOnly, async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
-// PUT /api/products/:id — изменить товар (только admin)
+// PUT /api/products/:id - изменить товар (только admin)
 router.put('/:id', requireAuth, adminOnly, async (req, res) => {
   const id = parseId(req.params.id);
   if (!id) {
@@ -85,7 +85,7 @@ router.put('/:id', requireAuth, adminOnly, async (req, res) => {
   res.json(rows[0]);
 });
 
-// DELETE /api/products/:id — удалить товар (только admin)
+// DELETE /api/products/:id - удалить товар (только admin)
 router.delete('/:id', requireAuth, adminOnly, async (req, res) => {
   const id = parseId(req.params.id);
   if (!id) {
