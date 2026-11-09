@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import jwt from 'jsonwebtoken';
 import { requireAuth, requireRole } from '../middleware/auth.js';
+import { errorHandler } from '../middleware/errorHandler.js';
 
 // «Поддельный» объект ответа: запоминает, какие методы и с чем вызывали
 function mockRes() {
@@ -70,5 +71,36 @@ describe('requireAuth', () => {
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json.mock.calls[0][0].error).toMatch(/истёк/);
     expect(next).not.toHaveBeenCalled();
+  });
+});
+
+describe('errorHandler', () => {
+  // errorHandler пишет ошибку в лог — в выводе тестов она не нужна
+  beforeEach(() => vi.spyOn(console, 'error').mockImplementation(() => {}));
+  afterEach(() => {
+    vi.unstubAllEnvs(); // вернуть NODE_ENV после каждого теста
+    vi.restoreAllMocks();
+  });
+
+  it('в продакшене скрывает текст ошибки 500', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const res = mockRes();
+    const err = new Error('connect ECONNREFUSED 10.0.0.5:5432');
+
+    errorHandler(err, { method: 'GET', originalUrl: '/x' }, res, vi.fn());
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json.mock.calls[0][0].error).toBe('Внутренняя ошибка сервера');
+  });
+
+  it('ошибку 400 даже в продакшене отдаёт со своим текстом', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const res = mockRes();
+    const err = Object.assign(new Error('Некорректные данные'), { status: 400 });
+
+    errorHandler(err, { method: 'POST', originalUrl: '/x' }, res, vi.fn());
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json.mock.calls[0][0].error).toBe('Некорректные данные');
   });
 });

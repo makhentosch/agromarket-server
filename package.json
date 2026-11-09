@@ -9,12 +9,14 @@
     "dev": "node --watch server.js",
     "start": "node server.js",
     "db:init": "node db/seed.js",
+    "db:migrate": "node db/migrate.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "smoke": "node scripts/smoke.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

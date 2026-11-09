@@ -1,6 +1,7 @@
 node_modules/
-.env
+# Все файлы окружения с секретами (.env, .env.test, .env.neon, .env.smoke ...)
+.env*
+!.env.example
 npm-debug.log*
 .DS_Store
-.env.test
 coverage/
