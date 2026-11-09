@@ -99,4 +99,24 @@ describe('Заявки', () => {
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
+
+  it('POST /api/orders доступен без токена — 201, заявку видит админ', async () => {
+    const order = { name: 'ТОО Тестовая ферма', email: 'Farm@Test.KZ', volume: 50 };
+
+    const created = await request(app).post('/api/orders').send(order);
+    expect(created.status).toBe(201);
+    expect(created.body.email).toBe('farm@test.kz');
+
+    const list = await request(app)
+      .get('/api/orders')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(list.body.map((o) => o.id)).toContain(created.body.id);
+  });
+
+  it('POST /api/orders с объёмом меньше 10 кг — 400', async () => {
+    const res = await request(app)
+      .post('/api/orders')
+      .send({ name: 'Мелкий опт', email: 'small@test.kz', volume: 5 });
+    expect(res.status).toBe(400);
+  });
 });
