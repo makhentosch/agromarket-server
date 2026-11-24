@@ -1,28 +1,12 @@
 import { Router } from 'express';
 import { pool } from '../db/pool.js';
 import { requireAuth, adminOnly } from '../middleware/auth.js';
+import { validate, idParam } from '../middleware/validate.js';
+import { productSchema, productUpdateSchema } from '../validation/schemas.js';
 
 const router = Router();
 
 const COLUMNS = 'id, name, category, price, unit, image';
-
-// id из адреса: только целое положительное число
-function parseId(value) {
-  const id = Number(value);
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
-
-// Проверка тела запроса для создания и изменения товара
-function validateProduct(body) {
-  const { name, price } = body ?? {};
-  if (typeof name !== 'string' || name.trim() === '') {
-    return 'Укажите название товара';
-  }
-  if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) {
-    return 'Цена должна быть неотрицательным числом';
-  }
-  return null;
-}
 
 // GET /api/products?category=Мёд - каталог (доступен всем)
 router.get('/', async (req, res) => {
@@ -34,12 +18,8 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/products/:id - один товар
-router.get('/:id', async (req, res) => {
-  const id = parseId(req.params.id);
-  if (!id) {
-    return res.status(400).json({ error: 'Некорректный id' });
-  }
-  const { rows } = await pool.query(`SELECT ${COLUMNS} FROM products WHERE id = $1`, [id]);
+router.get('/:id', idParam, async (req, res) => {
+  const { rows } = await pool.query(`SELECT ${COLUMNS} FROM products WHERE id = $1`, [req.params.id]);
   if (rows.length === 0) {
     return res.status(404).json({ error: 'Товар не найден' });
   }
@@ -47,37 +27,40 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/products - добавить товар (только admin)
-router.post('/', requireAuth, adminOnly, async (req, res) => {
-  const error = validateProduct(req.body);
-  if (error) {
-    return res.status(400).json({ error });
-  }
-  const { name, category = 'Разное', price, unit = 'шт', image = null } = req.body;
+router.post('/', requireAuth, adminOnly, validate(productSchema), async (req, res) => {
+  const { name, category, price, unit = 'шт', image = null } = req.body;
   const { rows } = await pool.query(
     `INSERT INTO products (name, category, price, unit, image)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING ${COLUMNS}`,
-    [name.trim(), category, price, unit, image],
+    [name, category, price, unit, image],
   );
   res.status(201).json(rows[0]);
 });
 
-// PUT /api/products/:id - изменить товар (только admin)
-router.put('/:id', requireAuth, adminOnly, async (req, res) => {
-  const id = parseId(req.params.id);
-  if (!id) {
-    return res.status(400).json({ error: 'Некорректный id' });
-  }
-  const error = validateProduct(req.body);
-  if (error) {
-    return res.status(400).json({ error });
-  }
-  const { name, category = 'Разное', price, unit = 'шт', image = null } = req.body;
+// PUT /api/products/:id - заменить товар целиком (только admin)
+router.put('/:id', requireAuth, adminOnly, idParam, validate(productSchema), async (req, res) => {
+  const { name, category, price, unit = 'шт', image = null } = req.body;
   const { rows } = await pool.query(
     `UPDATE products SET name = $1, category = $2, price = $3, unit = $4, image = $5
      WHERE id = $6
      RETURNING ${COLUMNS}`,
-    [name.trim(), category, price, unit, image, id],
+    [name, category, price, unit, image, req.params.id],
+  );
+  if (rows.length === 0) {
+    return res.status(404).json({ error: 'Товар не найден' });
+  }
+  res.json(rows[0]);
+});
+
+// PATCH /api/products/:id - изменить отдельные поля (только admin)
+router.patch('/:id', requireAuth, adminOnly, idParam, validate(productUpdateSchema), async (req, res) => {
+  // Имена колонок берутся только из схемы, значения передаются параметрами $1, $2 ...
+  const fields = Object.keys(req.body);
+  const assignments = fields.map((field, i) => `${field} = $${i + 1}`).join(', ');
+  const { rows } = await pool.query(
+    `UPDATE products SET ${assignments} WHERE id = $${fields.length + 1} RETURNING ${COLUMNS}`,
+    [...fields.map((field) => req.body[field]), req.params.id],
   );
   if (rows.length === 0) {
     return res.status(404).json({ error: 'Товар не найден' });
@@ -86,12 +69,8 @@ router.put('/:id', requireAuth, adminOnly, async (req, res) => {
 });
 
 // DELETE /api/products/:id - удалить товар (только admin)
-router.delete('/:id', requireAuth, adminOnly, async (req, res) => {
-  const id = parseId(req.params.id);
-  if (!id) {
-    return res.status(400).json({ error: 'Некорректный id' });
-  }
-  const { rowCount } = await pool.query('DELETE FROM products WHERE id = $1', [id]);
+router.delete('/:id', requireAuth, adminOnly, idParam, async (req, res) => {
+  const { rowCount } = await pool.query('DELETE FROM products WHERE id = $1', [req.params.id]);
   if (rowCount === 0) {
     return res.status(404).json({ error: 'Товар не найден' });
   }
