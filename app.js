@@ -19,17 +19,23 @@ const VERSION = (process.env.RENDER_GIT_COMMIT || 'local').slice(0, 7);
 // ВСЕХ пользователей одним человеком
 app.set('trust proxy', 1);
 
-app.use(helmet());
+app.use(helmet()); // ~15 заголовков безопасности одной строкой, убирает X-Powered-By
 
 // CORS_ORIGIN может содержать несколько адресов через запятую:
 // https://agromarket-makhentosch.vercel.app,http://localhost:5173
-const allowedOrigins = (process.env.CORS_ORIGIN || '')
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
-app.use(cors({ origin: allowedOrigins }));
+app.use(cors({
+  origin(origin, callback) {
+    // запросы без Origin (curl, Postman, тесты Supertest) пропускаем
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(null, false); // браузер с чужого сайта не получит ответ
+  },
+}));
 
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '100kb' })); // не принимать гигантские тела запросов
 
 // В тестах лог каждого запроса только мешает читать результат
 if (process.env.NODE_ENV !== 'test') {
