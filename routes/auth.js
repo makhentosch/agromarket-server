@@ -1,24 +1,14 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import rateLimit from 'express-rate-limit';
 import { pool } from '../db/pool.js';
 import { requireAuth } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimit.js';
 
 const router = Router();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
-
-// Не больше 5 неудачных попыток входа за 15 минут с одного IP
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 5,
-  skipSuccessfulRequests: true,
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-  message: { error: 'Слишком много попыток входа. Попробуйте через 15 минут' },
-});
 
 function createToken(user) {
   return jwt.sign({ sub: String(user.id), role: user.role }, process.env.JWT_SECRET, {
@@ -27,7 +17,7 @@ function createToken(user) {
 }
 
 // POST /api/auth/register - регистрация покупателя
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   const { name, email, password } = req.body ?? {};
 
   if (typeof name !== 'string' || name.trim() === '') {
@@ -62,7 +52,7 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/auth/login - вход по e-mail и паролю
-router.post('/login', loginLimiter, async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   const { email, password } = req.body ?? {};
 
   if (typeof email !== 'string' || typeof password !== 'string') {
